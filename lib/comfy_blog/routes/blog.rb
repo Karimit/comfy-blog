@@ -13,6 +13,10 @@ class ActionDispatch::Routing::Mapper
           o.get ":year/:month",       to: "posts#index",  as: :posts_of_month
           o.get ":year/:month/:slug", to: "posts#show",   as: :post
           o.get "/",                  to: "posts#index",  as: :posts
+          o.get "/:category",         to: "posts#index", constraints: lambda { |request|
+            Comfy::Cms::Category.of_type('Comfy::Blog::Post')
+              .all.pluck(:label).include?(request.params[:category])
+          }, as: :posts_by_category
         end
       end
     end

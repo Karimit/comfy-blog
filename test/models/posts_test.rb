@@ -8,6 +8,8 @@ class BlogPostsTest < ActiveSupport::TestCase
     @site   = comfy_cms_sites(:default)
     @layout = comfy_cms_layouts(:default)
     @post   = comfy_blog_posts(:default)
+    @category = Comfy::Cms::Category
+                  .create(label:'Magic', site: @site, categorized_type: 'Comfy::Blog::Post')
   end
 
   def test_fixtures_validity
@@ -100,6 +102,10 @@ class BlogPostsTest < ActiveSupport::TestCase
 
     ComfyBlog.config.public_blog_path = "test-blog"
     assert_equal "//test.host/test-blog/2012/1/default-title", @post.url
+  end
+
+  def test_url_category_constraint
+    assert Comfy::Cms::Category.of_type('Comfy::Blog::Post').all.pluck(:label).include?('Magic')
   end
 
 end
