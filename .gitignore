@@ -14,3 +14,5 @@ Gemfile.lock
 .ruby-version
 /.sass-cache
 coverage/
+.byebug_history
+storage/*

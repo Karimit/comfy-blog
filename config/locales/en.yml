@@ -8,6 +8,7 @@ en:
         slug: Slug
         published_at: Published at
         is_published: Is Published
+        featured: Featured
 
   comfy:
     admin:
