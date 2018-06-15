@@ -18,7 +18,7 @@ class Comfy::Blog::Post < ActiveRecord::Base
     presence: true
   validates :slug,
     uniqueness: { scope: %i[site_id year month] },
-    format:     { with: %r{\A%*\w[a-z0-9_%-]*\z}i }
+    format:     { with: /[a-zA-Z0-9\-_\p{Arabic}]+\z/i }
 
   # -- Scopes ------------------------------------------------------------------
   scope :published, -> { where(is_published: true) }
@@ -40,7 +40,19 @@ class Comfy::Blog::Post < ActiveRecord::Base
 protected
 
   def set_slug
-    self.slug ||= title.to_s.parameterize
+    t = title.to_s
+    self.slug = normalize_friendly_id(t) if slug.blank?
+  end
+
+  def normalize_friendly_id(value)
+    sep = '-'
+    parameterized_string = value.gsub(/[^a-zA-Z0-9\-_\p{Arabic}]+/, sep)
+    unless sep.nil? || sep.empty?
+      re_sep = Regexp.escape(sep)
+      parameterized_string.gsub!(/#{re_sep}{2,}/, sep) # No more than one of the separator in a row.
+      parameterized_string.gsub!(/^#{re_sep}|#{re_sep}$/, '') # Remove leading/trailing separator.
+    end
+    parameterized_string
   end
 
   def set_date
